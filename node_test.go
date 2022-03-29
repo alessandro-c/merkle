@@ -3,8 +3,36 @@ package merkle
 import (
 	"bytes"
 	"crypto/sha256"
+	"strings"
 	"testing"
 )
+
+func TestNode_Bytes(t *testing.T) {
+	exp := []byte("foo")
+	if act := (Node{val: []byte("foo")}).Bytes(); bytes.Compare(act, exp) != 0 {
+		t.Errorf("expected %s, got %s", exp, act)
+	}
+}
+
+func TestNode_Graphify(t *testing.T) {
+	exp := `3a64c13ffc8d22739538f49d901d909754e4ca185cf128ce7e64c8482f0cd8c6
+├── a26df13b366b0fc0e7a96ec9a1658d691d7640668de633333098d7952ce0c50b
+│   ├── 28b5a66c8c61ee13ad5f708a561d758b24d10abe5a0e72133c85d59821539e05
+│   │   ├── 3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d
+│   │   └── 3f79bb7b435b05321651daefd374cdc681dc06faa65e374e38337b88ca046dea
+│   └── 800e03ddb2432933692401d1631850c0af91953fd9c8f3874488c0541dfcf413
+│       ├── 18ac3e7343f016890c510e93f935261169d9e3f565436429830faf0934f4f8e4
+│       └── 2e7d2c03a9507ae265ecf5b5356885a53393a2029d241394997265a1a25aefc6
+└── ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb
+`
+
+	sb := strings.Builder{}
+	oddLeavesTree.Root().Graphify(&sb)
+
+	if act := sb.String(); act != exp {
+		t.Errorf("expected graphed tree to be : \n %s \n got \n %s", exp, act)
+	}
+}
 
 func TestNode_Sibling(t *testing.T) {
 	left := &Node{val: []byte("left")}

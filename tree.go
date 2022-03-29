@@ -1,18 +1,26 @@
 // Package merkle
 //
-// A merkle tree is a kind of binary tree where each node is labelled with a hash. Starting from the very bottom,
-// leaves will be paired and hashed together to make their parent inner-node, recursively up to the root a.k.a merkle root.
+// A merkle tree is a kind of binary tree where each node is labelled with a hash.
+// Starting from the very bottom, leaves will be paired and hashed together to make their parent inner-node,
+// recursively up to the root a.k.a merkle root.
 //
-// Merkle trees, are commonly used in distributed systems to efficiently compare large data set ensuring validity of such data.
+// Merkle trees, are commonly used in distributed systems to
+// efficiently compare large data set ensuring validity of such data.
 //
-// Some examples that leverage merkle trees are the Git version control, AWS's QLDB, Apache's Cassandra and last but not least, blockchains.
+// Some examples that leverage merkle trees are the :
+// - Git version control
+// - AWS's QLDB
+// - Apache's Cassandra
+// - blockchains
 //
 // There are different flavours of implementations, this package doesn't attempt to build an abstraction for all the
-// possible ones out there, it rather implements a fairly efficient specific one that can be used to experiment with the data structure and concepts.
+// possible ones out there, it rather implements a fairly efficient specific one
+// that can be used to experiment with the data structure and concepts.
 //
-// With that said, if you're looking to use this package to validate merkle proofs for existing blockchains you should look
-// elsewhere as their implementation may be different. For example, Bitcoin's merkle, duplicates eventual odd nodes to re-balance
-// the tree and this implementation doesn't, thus producing a different merkle root and proof.
+// With that said, if you're looking to use this package to validate merkle proofs for existing blockchains
+// you should look elsewhere as their implementation may be different.
+// For example, Bitcoin's merkle, duplicates eventual odd nodes to re-balance the tree
+// and this implementation doesn't, thus producing a different merkle root and proof.
 package merkle
 
 import (
@@ -21,7 +29,7 @@ import (
 	"sort"
 )
 
-// Tree is a whole merkle tree
+// Tree is a whole merkle tree.
 type Tree struct {
 	// the merkle root Node
 	root *Node
@@ -33,23 +41,22 @@ type Tree struct {
 // hashing algorithm and set of leaves that have been
 // hashed with the same algorithm.
 func NewTree(h hash.Hash, hl [][]byte) *Tree {
-	// turning leaves into nodes
+	// turning leaves into nodes.
 	leaves := byteArrSliceToNodes(hl...)
 	// sorting leaves lexicographically this will come
-	// in handy to efficiently build proofs and find leaves
+	// in handy to efficiently build proofs and find leaves.
 	sort.Sort(leaves)
-	// building up tree up to root
+	// building up tree up to root.
 	root := buildTree(h, leaves)
 	return &Tree{root, leaves}
 }
 
-// Root returns the root *Node a.k.a merkle root
+// Root returns the root *Node a.k.a merkle root.
 func (t Tree) Root() *Node {
 	return t.root
 }
 
 func buildTree(h hash.Hash, n Nodes) *Node {
-
 	// allocating with just enough capacity.
 	// +1 to give space for eventual odd to re-balance
 	ps := make(Nodes, 0, len(n)/2+1)
@@ -88,7 +95,6 @@ func buildTree(h hash.Hash, n Nodes) *Node {
 
 // Proof builds and returns the merkle proof for the provided hashed leaf.
 func (t Tree) Proof(hl []byte) Nodes {
-
 	// at first, let's find out whether the leaf actually
 	// exists. Given that the leaves were originally sorted
 	// we can use binary search to efficiently find the leaf.
