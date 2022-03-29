@@ -1,0 +1,25 @@
+on: ["push"]
+name: Tests & Lint
+jobs:
+
+  tests-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+      - name: tests with coverage report
+        run: go test -v -coverprofile=coverage.txt -covermode=atomic .
+      - name: upload coverage report
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.txt
+          verbose: true
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: lint
+        uses: golangci/golangci-lint-action@v2
