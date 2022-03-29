@@ -3,11 +3,12 @@ package merkle
 import (
 	"bytes"
 	"fmt"
-	"github.com/xlab/treeprint"
 	"io"
+
+	"github.com/xlab/treeprint"
 )
 
-// Node is a merkle tree node
+// Node is a merkle tree node.
 type Node struct {
 	// val is the node hashed value
 	val    []byte
@@ -16,17 +17,17 @@ type Node struct {
 	parent *Node
 }
 
-// Bytes return the raw hash
+// Bytes return the raw hash.
 func (n Node) Bytes() []byte {
 	return n.val
 }
 
-// Hex returns the Node val represented as an hexadecimal string
+// Hex returns the Node val represented as an hexadecimal string.
 func (n Node) Hex() string {
 	return fmt.Sprintf("%x", n.val)
 }
 
-// String implements most common interfaces
+// String implements most common interfaces.
 func (n Node) String() string {
 	// using fmt.Sprintf to allow certain IDE debuggers
 	// displaying the value during debug mode, realistically
@@ -35,17 +36,17 @@ func (n Node) String() string {
 	return fmt.Sprintf("%x", n.val)
 }
 
-// IsLeaf tells whether the Node is a leaf type of node
+// IsLeaf tells whether the Node is a leaf type of node.
 func (n *Node) IsLeaf() bool {
 	return n.left == nil && n.right == nil
 }
 
-// IsLeft tells whether the Node is a left child of its parent
+// IsLeft tells whether the Node is a left child of its parent.
 func (n *Node) IsLeft() bool {
 	return n.parent != nil && n.parent.left == n
 }
 
-// IsRight tells whether the Node is a right child of its parent
+// IsRight tells whether the Node is a right child of its parent.
 func (n *Node) IsRight() bool {
 	return n.parent != nil && n.parent.right == n
 }
@@ -71,9 +72,8 @@ func (n *Node) Sibling() *Node {
 //
 //  n.Graphify(os.Stdout)
 //
-// where n is the Node instance you want to print from
+// where n is the Node instance you want to print from.
 func (n *Node) Graphify(w io.Writer) {
-
 	branches := map[string]treeprint.Tree{
 		n.Hex(): treeprint.NewWithRoot(n.Hex()),
 	}
@@ -88,6 +88,7 @@ func (n *Node) Graphify(w io.Writer) {
 		}
 	})
 
+	// nolint:errcheck
 	w.Write(branches[n.Hex()].Bytes())
 }
 
@@ -106,39 +107,39 @@ func (n *Node) WalkPreOrder(fn func(n *Node, depth int)) {
 	por(n, 0, fn)
 }
 
-// Nodes is slice type of *Node
+// Nodes is slice type of *Node.
 type Nodes []*Node
 
-// Len implements the sort.Interface
-func (n Nodes) Len() int {
-	return len(n)
+// Len implements the sort.Interface.
+func (ns Nodes) Len() int {
+	return len(ns)
 }
 
-// Less implements the sort.Interface
-func (n Nodes) Less(i, j int) bool {
-	return bytes.Compare(n[i].val, n[j].val) == -1
+// Less implements the sort.Interface.
+func (ns Nodes) Less(i, j int) bool {
+	return bytes.Compare(ns[i].val, ns[j].val) == -1
 }
 
-// Swap implements the sort.Interface
-func (n Nodes) Swap(i, j int) {
-	n[i], n[j] = n[j], n[i]
+// Swap implements the sort.Interface.
+func (ns Nodes) Swap(i, j int) {
+	ns[i], ns[j] = ns[j], ns[i]
 }
 
 // IteratePair iterates through all Nodes pairing with fn(i,j).
 // If there is an odd number Nodes the last element Node len(n) - 1 will be returned.
-func (n Nodes) IteratePair(fn func(i, j *Node)) (odd *Node) {
-	if len(n)%2 != 0 {
-		odd = n[len(n)-1]
+func (ns Nodes) IteratePair(fn func(i, j *Node)) (odd *Node) {
+	if len(ns)%2 != 0 {
+		odd = ns[len(ns)-1]
 	}
-	for i := 0; i < len(n)-1; i = i + 2 {
-		fn(n[i], n[i+1])
+	for i := 0; i < len(ns)-1; i += 2 {
+		fn(ns[i], ns[i+1])
 	}
 	return
 }
 
-// IterateSortedPair iterate same as IteratePair but with sorted ascending i,j
-func (n Nodes) IterateSortedPair(fn func(i, j *Node)) (odd *Node) {
-	odd = n.IteratePair(func(i, j *Node) {
+// IterateSortedPair iterate same as IteratePair but with sorted ascending i,j.
+func (ns Nodes) IterateSortedPair(fn func(i, j *Node)) (odd *Node) {
+	odd = ns.IteratePair(func(i, j *Node) {
 		if bytes.Compare(i.val, j.val) == 1 {
 			// i > j
 			fn(j, i)
@@ -158,7 +159,7 @@ func (ns Nodes) ToHexStrings() []string {
 	return hexs
 }
 
-// ToByteArrays converts each Node in Nodes into a slice of byte array
+// ToByteArrays converts each Node in Nodes into a slice of byte array.
 func (ns Nodes) ToByteArrays() [][]byte {
 	barr := make([][]byte, 0, len(ns))
 	for _, n := range ns {
@@ -168,8 +169,9 @@ func (ns Nodes) ToByteArrays() [][]byte {
 }
 
 // newNode makes and return a new *Node
-// with the provided hash set as val
+// with the provided hash set as val.
 func newNode(h []byte) *Node {
+	// nolint: exhaustivestruct
 	return &Node{val: h}
 }
 
@@ -183,7 +185,7 @@ func newParentNode(h []byte, l, r *Node) *Node {
 	return n
 }
 
-// byteArrSliceToNodes turns the byte array slice into Nodes
+// byteArrSliceToNodes turns the byte array slice into Nodes.
 func byteArrSliceToNodes(bas ...[]byte) Nodes {
 	nodes := make(Nodes, len(bas))
 	for i := 0; i < len(bas); i++ {
