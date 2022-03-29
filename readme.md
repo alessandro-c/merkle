@@ -1,4 +1,14 @@
-## A merkle tree implementation in Go
+<h1 align="center">A merkle tree implementation in Go</h1>
+
+<p align="center">
+
+<img src="https://github.com/alessandro-c/merkle/actions/workflows/push.yml/badge.svg">
+
+<img src="https://codecov.io/gh/alessandro-c/merkle/branch/master/graph/badge.svg?token=0SMARDBUGU"/>
+
+</p>
+
+------------------------------------------------------------------------------------------------------------------------
 
 A merkle tree is a kind of binary tree where each node is labelled with a hash. Starting from the very bottom,
 leaves will be paired and hashed together to make their parent inner-node, recursively up to the root a.k.a merkle root.
